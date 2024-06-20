@@ -1,9 +1,5 @@
-import { Login } from "./pages/login";
+import { Router } from "./routes/routes";
 
 export const App = () => {
-  return (
-    <>
-      <Login />
-    </>
-  );
+  return <Router />;
 };
