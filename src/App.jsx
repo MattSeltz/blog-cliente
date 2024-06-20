@@ -1,7 +1,9 @@
+import { Login } from "./pages/login";
+
 export const App = () => {
   return (
     <>
-      <h1>Blog</h1>
+      <Login />
     </>
   );
 };
