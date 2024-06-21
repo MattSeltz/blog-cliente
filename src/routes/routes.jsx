@@ -2,6 +2,8 @@ import { Routes, Route, Link } from "react-router-dom";
 
 import { Login } from "../pages/login";
 import { Register } from "../pages/register";
+import { Recovery } from "../pages/recovery";
+import { RecoveryAccount } from "../pages/recoveryAccount";
 
 export const Router = () => {
   return (
@@ -19,6 +21,8 @@ export const Router = () => {
       />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
+      <Route path="/recovery" element={<Recovery />} />
+      <Route path="/recovery/:id" element={<RecoveryAccount />} />
     </Routes>
   );
 };
