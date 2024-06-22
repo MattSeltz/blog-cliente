@@ -1,14 +1,17 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import { useDispatch } from "react-redux";
 
 import Box from "@mui/material/Box";
 import CircularProgress from "@mui/material/CircularProgress";
 import { green } from "@mui/material/colors";
 
 import { postData } from "../services/services";
+import { setGlobalUser } from "../contexts/userSlice";
 
 export const Login = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -25,8 +28,11 @@ export const Login = () => {
       setIsMatch(true);
 
       const res = await postData("/auth/login", { username, password });
+      const data = await res.json();
 
       if (res.status.toLocaleString().startsWith("2")) {
+        sessionStorage.setItem("globalUser", JSON.stringify(data));
+        dispatch(setGlobalUser(data));
         navigate("/");
       } else {
         setIsMatch(false);
