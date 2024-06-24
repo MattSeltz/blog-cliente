@@ -5,7 +5,7 @@ import { Register } from "../pages/register";
 import { Recovery } from "../pages/recovery";
 import { RecoveryAccount } from "../pages/recoveryAccount";
 import { NavBar } from "../layout/navBar";
-import { Publication } from "../components/Publication";
+import { Publications } from "../pages/publications";
 import { PublicationPage } from "../pages/publicationPage";
 import { User } from "../pages/user";
 
@@ -14,7 +14,7 @@ export const Router = () => {
     <>
       <NavBar />
       <Routes>
-        <Route path="/" element={<Publication />} />
+        <Route path="/" element={<Publications />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/recovery" element={<Recovery />} />

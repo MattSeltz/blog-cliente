@@ -3,6 +3,7 @@ import { useDispatch } from "react-redux";
 
 import { Router } from "./routes/routes";
 import { setGlobalUser } from "./contexts/userSlice";
+import { getOneData } from "./services/services";
 
 export const App = () => {
   const dispatch = useDispatch();
@@ -10,7 +11,11 @@ export const App = () => {
   useEffect(() => {
     const user = JSON.parse(sessionStorage.getItem("globalUser"));
 
-    dispatch(setGlobalUser(user));
+    if (!user) return;
+
+    getOneData("/auth/", user._id)
+      .then((res) => dispatch(setGlobalUser(res)))
+      .catch((e) => console.error(e));
   }, []);
 
   return <Router />;
