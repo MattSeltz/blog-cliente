@@ -54,7 +54,7 @@ export const Publication = ({ publication, setPublicationList }) => {
       }
       dispatch(setGlobalUser(user));
       const resData = await getData("/publication");
-      setPublicationList(resData);
+      setPublicationList(resData.reverse());
       setIsLiked(like);
     } else {
       const { likes } = await getOneData("/publication/", publication._id);
@@ -77,7 +77,7 @@ export const Publication = ({ publication, setPublicationList }) => {
       }
       dispatch(setGlobalUser(user));
       const resData = await getData("/publication");
-      setPublicationList(resData);
+      setPublicationList(resData.reverse());
       setIsLiked(like);
     }
   };
@@ -85,7 +85,7 @@ export const Publication = ({ publication, setPublicationList }) => {
   return (
     <article
       id={publication._id}
-      className="flex max-w-xl flex-col items-start justify-between shadow-md p-3 rounded-md"
+      className="flex flex-col items-start justify-between shadow-md p-3 rounded-md"
     >
       <div className="flex items-center gap-x-4 text-xs">
         <time dateTime={publication.date} className="text-gray-500">
@@ -93,7 +93,9 @@ export const Publication = ({ publication, setPublicationList }) => {
           {publication.date.split("T")[1].split(".")[0]}
         </time>
         <p className="font-semibold text-gray-900">
-          <Link to={`/user/${publication._id}`}>{publication.author}</Link>
+          <Link to={`/user/${publication._id}`}>
+            {publication.author[0].username}
+          </Link>
         </p>
       </div>
       <div className="group relative w-full">
