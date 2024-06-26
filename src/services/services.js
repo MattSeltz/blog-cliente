@@ -19,8 +19,8 @@ export const getOneData = async (uri,id) => {
       method:"GET",
       credentials: "include"
     })
-  const data = await res.json()
-  return data
+    const data = await res.json()
+    return data
   } catch (error) {
     console.error(error)
   }

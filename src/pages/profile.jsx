@@ -1,16 +1,20 @@
 import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 
-import { getOneData } from "../services/services";
 import { Publication } from "../components/Publication";
+import { getOneData } from "../services/services";
 
-export const User = () => {
+export const Profile = () => {
+  const userGlobal = useSelector((state) => state.user.value);
   const [publicationList, setPublicationList] = useState(null);
 
   useEffect(() => {
-    getOneData(`/auth/`, location.pathname.split("/")[2])
+    if (!userGlobal) return;
+
+    getOneData("/auth/", userGlobal?._id)
       .then((res) => setPublicationList(res.publications.reverse()))
       .catch((e) => console.error(e));
-  }, []);
+  }, [userGlobal]);
 
   return (
     <div className="mx-auto max-w-7xl px-6 lg:px-8 ">

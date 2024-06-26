@@ -90,13 +90,16 @@ export const Publication = ({ publication, setPublicationList }) => {
       <div className="flex items-center gap-x-4 text-xs">
         <time dateTime={publication.date} className="text-gray-500">
           {publication.date.split("T")[0]}{" "}
-          {publication.date.split("T")[1].split(".")[0]}
+          {publication.date.split("T")[1].split(":")[0] - 3}:
+          {publication.date.split("T")[1].split(":")[1]}
         </time>
-        <p className="font-semibold text-gray-900">
-          <Link to={`/user/${publication._id}`}>
-            {publication.author[0].username}
-          </Link>
-        </p>
+        {location.pathname === "/" && (
+          <p className="font-semibold text-gray-900">
+            <Link to={`/user/${publication.author[0]._id}`}>
+              {publication.author[0].username}
+            </Link>
+          </p>
+        )}
       </div>
       <div className="group relative w-full">
         <h3 className="mt-3 text-lg font-semibold leading-6 text-gray-900 ">

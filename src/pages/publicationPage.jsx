@@ -20,7 +20,7 @@ export const PublicationPage = () => {
             <div>
               <p className="text-base font-semibold leading-7 text-indigo-600">
                 <Link to={`/user/${publication?._id}`}>
-                  {publication?.author}
+                  {publication?.author[0].username}
                 </Link>
               </p>
               <h1 className="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
