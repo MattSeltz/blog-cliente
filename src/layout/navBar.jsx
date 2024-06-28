@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
+import { Link, useNavigate } from "react-router-dom";
 
 import { styled, alpha } from "@mui/material/styles";
 import AppBar from "@mui/material/AppBar";
@@ -19,9 +20,15 @@ import HomeIcon from "@mui/icons-material/Home";
 import LoginIcon from "@mui/icons-material/Login";
 import CreateIcon from "@mui/icons-material/Create";
 import LogoutIcon from "@mui/icons-material/Logout";
-import { Link, useNavigate } from "react-router-dom";
+import List from "@mui/material/List";
+import ListItem from "@mui/material/ListItem";
+import ListItemButton from "@mui/material/ListItemButton";
+import ListItemIcon from "@mui/material/ListItemIcon";
+import ListItemText from "@mui/material/ListItemText";
+import Divider from "@mui/material/Divider";
+import Avatar from "@mui/material/Avatar";
 
-import { deleteData } from "../services/services";
+import { deleteData, getData } from "../services/services";
 import { setGlobalUser } from "../contexts/userSlice";
 
 const Search = styled("div")(({ theme }) => ({
@@ -68,15 +75,40 @@ export const NavBar = () => {
   const disptach = useDispatch();
   const userGlobal = useSelector((state) => state.user.value);
 
+  const [userList, setUserList] = useState(null);
+  const [userListToSearch, setUserListToSearch] = useState(null);
+
+  useEffect(() => {
+    getData("/auth")
+      .then((res) => setUserListToSearch(res))
+      .catch((e) => console.error(e));
+  }, []);
+
   const logout = async () => {
     const res = await deleteData("/auth/logout/", 0);
 
     if (res.status.toLocaleString().startsWith("2")) {
+      setMobileMoreAnchorEl(null);
       disptach(setGlobalUser(null));
       sessionStorage.removeItem("globalUser");
       navigate("/");
     } else {
       alert("Ha ocurrido un error inesperado, vuelve a intentarlo...");
+    }
+  };
+
+  const search = (e) => {
+    let user = e.target.value;
+
+    if (user) {
+      const userListCopy = [...userListToSearch];
+      let newUserList = userListCopy.filter((item) =>
+        item.username.toLowerCase().includes(e.target.value.toLowerCase())
+      );
+
+      setUserList(newUserList);
+    } else {
+      setUserList(null);
     }
   };
 
@@ -140,7 +172,7 @@ export const NavBar = () => {
     >
       {userGlobal ? (
         <>
-          <Link to="/profile">
+          <Link to="/profile" onClick={handleMobileMenuClose}>
             <MenuItem>
               <IconButton
                 size="large"
@@ -152,7 +184,7 @@ export const NavBar = () => {
               <p>Perfil</p>
             </MenuItem>
           </Link>
-          <Link to="/notifications">
+          <Link to="/notifications" onClick={handleMobileMenuClose}>
             <MenuItem>
               <IconButton
                 size="large"
@@ -179,7 +211,7 @@ export const NavBar = () => {
         </>
       ) : (
         <>
-          <Link to="/login">
+          <Link to="/login" onClick={handleMobileMenuClose}>
             <MenuItem>
               <IconButton
                 size="large"
@@ -193,7 +225,7 @@ export const NavBar = () => {
               <p>Inicia sesión</p>
             </MenuItem>
           </Link>
-          <Link to="/register">
+          <Link to="/register" onClick={handleMobileMenuClose}>
             <MenuItem>
               <IconButton
                 size="large"
@@ -236,7 +268,7 @@ export const NavBar = () => {
           >
             BLOG
           </Typography>
-          <Search>
+          <Search onChange={search}>
             <SearchIconWrapper>
               <SearchIcon />
             </SearchIconWrapper>
@@ -245,6 +277,45 @@ export const NavBar = () => {
               inputProps={{ "aria-label": "search" }}
             />
           </Search>
+          {userList && (
+            <Box
+              sx={{
+                width: "100%",
+                maxWidth: 360,
+                bgcolor: "background.paper",
+                position: "fixed",
+                top: "55px",
+                left: "65px",
+                borderRadius: "5px",
+                color: "#000000",
+              }}
+            >
+              <nav aria-label="main mailbox folders">
+                <List>
+                  {userList?.map((item) => (
+                    <Link
+                      to={`/user/${item._id}`}
+                      key={item._id}
+                      onClick={() => {
+                        setUserList(null);
+                        setUserListToSearch(null);
+                      }}
+                    >
+                      <ListItem disablePadding>
+                        <ListItemButton>
+                          <ListItemIcon>
+                            <Avatar alt={item.username} src={item.icon} />
+                          </ListItemIcon>
+                          <ListItemText primary={item.username} />
+                        </ListItemButton>
+                      </ListItem>
+                    </Link>
+                  ))}
+                </List>
+              </nav>
+              <Divider />
+            </Box>
+          )}
           <Box sx={{ flexGrow: 1 }} />
           <Box sx={{ display: { xs: "none", md: "flex" } }}>
             {userGlobal ? (
