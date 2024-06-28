@@ -1,6 +1,7 @@
 import Grid from "@mui/material/Grid";
 import Paper from "@mui/material/Paper";
 import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
 import { createTheme, ThemeProvider, styled } from "@mui/material/styles";
 
 const Item = styled(Paper)(({ theme }) => ({
@@ -15,6 +16,7 @@ const darkTheme = createTheme({ palette: { mode: "dark" } });
 
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
+import { Link } from "react-router-dom";
 
 import { Publication } from "../components/Publication";
 import { getOneData } from "../services/services";
@@ -69,6 +71,11 @@ export const Profile = () => {
             </ThemeProvider>
           </Grid>
         </Grid>
+        <Link to="/edit">
+          <Button variant="contained" className="w-full">
+            Editar perfil
+          </Button>
+        </Link>
         {publicationList?.map((publication) => (
           <Publication
             key={publication._id}

@@ -9,6 +9,7 @@ import { Publications } from "../pages/publications";
 import { PublicationPage } from "../pages/publicationPage";
 import { Profile } from "../pages/profile";
 import { User } from "../pages/user";
+import { Edit } from "../pages/edit";
 
 export const Router = () => {
   return (
@@ -24,6 +25,7 @@ export const Router = () => {
         <Route path="/notifications" element={<h1>Notifications</h1>} />
         <Route path="/publication/:id" element={<PublicationPage />} />
         <Route path="/user/:id" element={<User />} />
+        <Route path="/edit" element={<Edit />} />
       </Routes>
     </>
   );

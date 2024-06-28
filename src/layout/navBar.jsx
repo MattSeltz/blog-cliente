@@ -69,7 +69,7 @@ export const NavBar = () => {
   const userGlobal = useSelector((state) => state.user.value);
 
   const logout = async () => {
-    const res = await deleteData("/auth/logout", "");
+    const res = await deleteData("/auth/logout/", 0);
 
     if (res.status.toLocaleString().startsWith("2")) {
       disptach(setGlobalUser(null));

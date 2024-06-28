@@ -2,6 +2,7 @@ import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import ChatBubbleOutlineIcon from "@mui/icons-material/ChatBubbleOutline";
 import Divider from "@mui/material/Divider";
 import FavoriteIcon from "@mui/icons-material/Favorite";
+import Avatar from "@mui/material/Avatar";
 
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
@@ -90,10 +91,9 @@ export const Publication = ({ publication, setPublicationList }) => {
       <div className="flex justify-between items-center gap-x-4 text-xs w-full">
         {location.pathname === "/" && (
           <div className="flex items-center gap-3">
-            <img
-              src={publication.author[0].icon}
+            <Avatar
               alt={publication.author[0].username}
-              className="rounded-full w-5"
+              src={publication.author[0].icon}
             />
             <p className="font-semibold text-gray-900">
               <Link to={`/user/${publication.author[0]._id}`}>
