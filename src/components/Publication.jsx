@@ -87,19 +87,26 @@ export const Publication = ({ publication, setPublicationList }) => {
       id={publication._id}
       className="flex flex-col items-start justify-between shadow-md p-3 rounded-md"
     >
-      <div className="flex items-center gap-x-4 text-xs">
+      <div className="flex justify-between items-center gap-x-4 text-xs w-full">
+        {location.pathname === "/" && (
+          <div className="flex items-center gap-3">
+            <img
+              src={publication.author[0].icon}
+              alt={publication.author[0].username}
+              className="rounded-full w-5"
+            />
+            <p className="font-semibold text-gray-900">
+              <Link to={`/user/${publication.author[0]._id}`}>
+                {publication.author[0].username}
+              </Link>
+            </p>
+          </div>
+        )}
         <time dateTime={publication.date} className="text-gray-500">
           {publication.date.split("T")[0]}{" "}
           {publication.date.split("T")[1].split(":")[0] - 3}:
           {publication.date.split("T")[1].split(":")[1]}
         </time>
-        {location.pathname === "/" && (
-          <p className="font-semibold text-gray-900">
-            <Link to={`/user/${publication.author[0]._id}`}>
-              {publication.author[0].username}
-            </Link>
-          </p>
-        )}
       </div>
       <div className="group relative w-full">
         <h3 className="mt-3 text-lg font-semibold leading-6 text-gray-900 ">
