@@ -14,11 +14,14 @@ const Item = styled(Paper)(({ theme }) => ({
 const darkTheme = createTheme({ palette: { mode: "dark" } });
 
 import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 
 import { getOneData } from "../services/services";
 import { Publication } from "../components/Publication";
 
 export const User = () => {
+  const userGlobal = useSelector((state) => state.user.value);
+
   const [publicationList, setPublicationList] = useState(null);
   const [user, setUser] = useState(null);
 
@@ -29,7 +32,7 @@ export const User = () => {
         setUser(res);
       })
       .catch((e) => console.error(e));
-  }, []);
+  }, [userGlobal]);
 
   return (
     <div className="mx-auto max-w-7xl px-6 lg:px-8 ">
@@ -60,7 +63,9 @@ export const User = () => {
                   Publicaciones: {user?.publications.length}
                 </Item>
                 <Item elevation={24}>Comentarios: {user?.comments.length}</Item>
-                <Item elevation={24}>Likes: {user?.likes.length}</Item>
+                <Item elevation={24}>
+                  Likes: {user?.likes.concat(user?.commentLikes).length}
+                </Item>
               </Box>
             </ThemeProvider>
           </Grid>

@@ -1,7 +1,94 @@
 import { Avatar, Divider } from "@mui/material";
-import { Link } from "react-router-dom";
+import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
+import FavoriteIcon from "@mui/icons-material/Favorite";
 
-export const Comment = ({ comment }) => {
+import { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
+
+import { getOneData, updateData } from "../services/services";
+import { setGlobalUser } from "../contexts/userSlice";
+
+export const Comment = ({ comment, setCommentList }) => {
+  const userGlobal = useSelector((state) => state.user.value);
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  const [isLiked, setIsLiked] = useState(false);
+
+  useEffect(() => {
+    const isMatch = comment.likes.filter(
+      (item) => item._id === userGlobal?._id
+    );
+
+    isMatch.length > 0 ? setIsLiked(true) : setIsLiked(false);
+  }, [userGlobal]);
+
+  const sendLike = async (like) => {
+    if (!userGlobal) {
+      alert("Inicia sesión para interactuar...");
+      navigate("/login");
+      return;
+    }
+    if (like) {
+      const { likes } = await getOneData("/comment/", comment._id);
+      likes.push(userGlobal._id);
+      const resStatus = await updateData("/comment/", comment._id, {
+        likes,
+      });
+      if (resStatus.status.toLocaleString().startsWith("4")) {
+        alert("Ha ocurrido un error inesperado, vuelve a intentarlo...");
+        return;
+      }
+      const user = await getOneData("/auth/", userGlobal._id);
+      user.commentLikes.push(comment._id);
+      const userStatus = await updateData("/auth/like/", userGlobal._id, {
+        commentLikes: user.commentLikes,
+      });
+      const userJSON = await userStatus.json();
+      if (userStatus.status.toLocaleString().startsWith("4")) {
+        alert("Ha ocurrido un error inesperado, vuelve a intentarlo...");
+        return;
+      }
+      dispatch(setGlobalUser(userJSON));
+      const resData = await getOneData(
+        "/publication/",
+        location.pathname.split("/")[2]
+      );
+      setCommentList(resData.comments.reverse());
+      setIsLiked(like);
+    } else {
+      const { likes } = await getOneData("/comment/", comment._id);
+      const disLike = likes.filter((item) => item._id !== userGlobal._id);
+      const resStatus = await updateData("/comment/", comment._id, {
+        likes: disLike,
+      });
+      if (resStatus.status.toLocaleString().startsWith("4")) {
+        alert("Ha ocurrido un error inesperado, vuelve a intentarlo...");
+        return;
+      }
+      const user = await getOneData("/auth/", userGlobal._id);
+      const disLikeUser = user.commentLikes.filter(
+        (item) => item !== comment._id
+      );
+      const userStatus = await updateData("/auth/like/", userGlobal._id, {
+        commentLikes: disLikeUser,
+      });
+      const userJSON = await userStatus.json();
+      if (userStatus.status.toLocaleString().startsWith("4")) {
+        alert("Ha ocurrido un error inesperado, vuelve a intentarlo...");
+        return;
+      }
+      dispatch(setGlobalUser(userJSON));
+      const resData = await getOneData(
+        "/publication/",
+        location.pathname.split("/")[2]
+      );
+      setCommentList(resData.comments.reverse());
+      setIsLiked(like);
+    }
+  };
+
   return (
     <article
       id={comment._id}
@@ -33,26 +120,21 @@ export const Comment = ({ comment }) => {
         <Divider />
         <div className="flex justify-between mt-3">
           <div className="flex gap-1">
-            {/* {isLiked ? (
-              // <FavoriteIcon
-              //   onClick={() => sendLike(false)}
-              //   className="cursor-pointer"
-              // />
+            {isLiked ? (
+              <FavoriteIcon
+                onClick={() => sendLike(false)}
+                className="cursor-pointer"
+              />
             ) : (
-              // <FavoriteBorderIcon
-              //   onClick={() => sendLike(true)}
-              //   className="cursor-pointer"
-              // />
-            )} */}
-            <span>{/* <b>{publication.likes.length}</b> */}</span>
+              <FavoriteBorderIcon
+                onClick={() => sendLike(true)}
+                className="cursor-pointer"
+              />
+            )}
+            <span>
+              <b>{comment.likes.length}</b>
+            </span>
           </div>
-
-          {/* <Link
-            to={`/publication/${publication._id}`}
-            className="cursor-pointer"
-          >
-            <ChatBubbleOutlineIcon />
-          </Link> */}
         </div>
       </div>
     </article>

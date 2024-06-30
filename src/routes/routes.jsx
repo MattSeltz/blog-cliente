@@ -22,7 +22,6 @@ export const Router = () => {
         <Route path="/recovery" element={<Recovery />} />
         <Route path="/recovery/:id" element={<RecoveryAccount />} />
         <Route path="/profile" element={<Profile />} />
-        <Route path="/notifications" element={<h1>Notifications</h1>} />
         <Route path="/publication/:id" element={<PublicationPage />} />
         <Route path="/user/:id" element={<User />} />
         <Route path="/edit" element={<Edit />} />

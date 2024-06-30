@@ -66,7 +66,10 @@ export const Profile = () => {
                 <Item elevation={24}>
                   Comentarios: {userGlobal?.comments.length}
                 </Item>
-                <Item elevation={24}>Likes: {userGlobal?.likes.length}</Item>
+                <Item elevation={24}>
+                  Likes:{" "}
+                  {userGlobal?.likes.concat(userGlobal?.commentLikes).length}
+                </Item>
               </Box>
             </ThemeProvider>
           </Grid>

@@ -8,12 +8,10 @@ import Toolbar from "@mui/material/Toolbar";
 import IconButton from "@mui/material/IconButton";
 import Typography from "@mui/material/Typography";
 import InputBase from "@mui/material/InputBase";
-import Badge from "@mui/material/Badge";
 import MenuItem from "@mui/material/MenuItem";
 import Menu from "@mui/material/Menu";
 import SearchIcon from "@mui/icons-material/Search";
 import AccountCircle from "@mui/icons-material/AccountCircle";
-import NotificationsIcon from "@mui/icons-material/Notifications";
 import MoreIcon from "@mui/icons-material/MoreVert";
 import HomeIcon from "@mui/icons-material/Home";
 import LoginIcon from "@mui/icons-material/Login";
@@ -72,7 +70,7 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 
 export const NavBar = () => {
   const navigate = useNavigate();
-  const disptach = useDispatch();
+  const dispatch = useDispatch();
   const userGlobal = useSelector((state) => state.user.value);
 
   const [userList, setUserList] = useState(null);
@@ -89,7 +87,7 @@ export const NavBar = () => {
 
     if (res.status.toLocaleString().startsWith("2")) {
       setMobileMoreAnchorEl(null);
-      disptach(setGlobalUser(null));
+      dispatch(setGlobalUser(null));
       sessionStorage.removeItem("globalUser");
       navigate("/");
     } else {
@@ -184,20 +182,7 @@ export const NavBar = () => {
               <p>Perfil</p>
             </MenuItem>
           </Link>
-          <Link to="/notifications" onClick={handleMobileMenuClose}>
-            <MenuItem>
-              <IconButton
-                size="large"
-                aria-label="show 17 new notifications"
-                color="inherit"
-              >
-                <Badge badgeContent={17} color="error">
-                  <NotificationsIcon />
-                </Badge>
-              </IconButton>
-              <p>Notificaciones</p>
-            </MenuItem>
-          </Link>
+
           <MenuItem onClick={logout}>
             <IconButton
               size="large"
@@ -327,18 +312,6 @@ export const NavBar = () => {
                     color="inherit"
                   >
                     <AccountCircle />
-                  </IconButton>
-                </Link>
-
-                <Link to="/notifications">
-                  <IconButton
-                    size="large"
-                    aria-label="show 17 new notifications"
-                    color="inherit"
-                  >
-                    <Badge badgeContent={17} color="error">
-                      <NotificationsIcon />
-                    </Badge>
                   </IconButton>
                 </Link>
 

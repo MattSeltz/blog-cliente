@@ -101,7 +101,7 @@ export const PublicationPage = () => {
           <div>
             <div>
               <p className="text-base font-semibold leading-7 text-indigo-600">
-                <Link to={`/user/${publication?._id}`}>
+                <Link to={`/user/${publication?.author[0]._id}`}>
                   {publication?.author[0].username}
                 </Link>
               </p>
@@ -134,7 +134,11 @@ export const PublicationPage = () => {
         )}
 
         {commentList?.map((comment) => (
-          <Comment key={comment._id} comment={comment} />
+          <Comment
+            key={comment._id}
+            comment={comment}
+            setCommentList={setCommentList}
+          />
         ))}
       </div>
     </div>

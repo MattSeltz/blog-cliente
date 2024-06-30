@@ -1,7 +1,7 @@
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
+import FavoriteIcon from "@mui/icons-material/Favorite";
 import ChatBubbleOutlineIcon from "@mui/icons-material/ChatBubbleOutline";
 import Divider from "@mui/material/Divider";
-import FavoriteIcon from "@mui/icons-material/Favorite";
 import Avatar from "@mui/material/Avatar";
 
 import { Link, useNavigate } from "react-router-dom";
@@ -9,7 +9,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { useState, useEffect } from "react";
 
 import { setGlobalUser } from "../contexts/userSlice";
-
 import { getData, getOneData, updateData } from "../services/services";
 
 export const Publication = ({ publication, setPublicationList }) => {
@@ -49,11 +48,12 @@ export const Publication = ({ publication, setPublicationList }) => {
       const userStatus = await updateData("/auth/like/", userGlobal._id, {
         likes: user.likes,
       });
+      const userJSON = await userStatus.json();
       if (userStatus.status.toLocaleString().startsWith("4")) {
         alert("Ha ocurrido un error inesperado, vuelve a intentarlo...");
         return;
       }
-      dispatch(setGlobalUser(user));
+      dispatch(setGlobalUser(userJSON));
       const resData = await getData("/publication");
       setPublicationList(resData.reverse());
       setIsLiked(like);
@@ -72,11 +72,12 @@ export const Publication = ({ publication, setPublicationList }) => {
       const userStatus = await updateData("/auth/like/", userGlobal._id, {
         likes: disLikeUser,
       });
+      const userJSON = await userStatus.json();
       if (userStatus.status.toLocaleString().startsWith("4")) {
         alert("Ha ocurrido un error inesperado, vuelve a intentarlo...");
         return;
       }
-      dispatch(setGlobalUser(user));
+      dispatch(setGlobalUser(userJSON));
       const resData = await getData("/publication");
       setPublicationList(resData.reverse());
       setIsLiked(like);
@@ -139,7 +140,7 @@ export const Publication = ({ publication, setPublicationList }) => {
             to={`/publication/${publication._id}`}
             className="cursor-pointer"
           >
-            <ChatBubbleOutlineIcon />
+            <ChatBubbleOutlineIcon /> <b>{publication.comments.length}</b>
           </Link>
         </div>
       </div>
