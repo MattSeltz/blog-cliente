@@ -11,7 +11,7 @@ import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 
-import { getOneData, updateData } from "../services/services";
+import { deleteData, getOneData, updateData } from "../services/services";
 import { setGlobalUser } from "../contexts/userSlice";
 import { CommentEdit } from "./CommentEdit";
 
@@ -103,6 +103,49 @@ export const Comment = ({ comment, setCommentList }) => {
     }
   };
 
+  const deleteComment = async () => {
+    const deleteRes = await deleteData("/comment/", comment._id);
+    if (deleteRes.status.toLocaleString().startsWith("4")) {
+      alert("Ha ocurrido un error inesperado, vuelve a intentarlo...");
+      return;
+    }
+    const { comments } = await getOneData(
+      "/publication/",
+      location.pathname.split("/")[2]
+    );
+    const filteredPublication = comments.filter(
+      (item) => item._id !== comment._id
+    );
+    const publicationRes = await updateData(
+      "/publication/",
+      location.pathname.split("/")[2],
+      { comments: filteredPublication }
+    );
+    const data = await publicationRes.json();
+    if (publicationRes.status.toLocaleString().startsWith("4")) {
+      alert("Ha ocurrido un error inesperado, vuelve a intentarlo...");
+      return;
+    }
+    const userComments = await getOneData("/auth/", userGlobal._id);
+    const filteredUser = userComments.comments.filter(
+      (item) => item._id !== comment._id
+    );
+    const commentLikes = userComments.commentLikes.filter(
+      (item) => item._id !== comment._id
+    );
+    const userRes = await updateData("/auth/like/", userGlobal._id, {
+      comments: filteredUser,
+      commentLikes,
+    });
+    const userJSON = await userRes.json();
+    if (userRes.status.toLocaleString().startsWith("4")) {
+      alert("Ha ocurrido un error inesperado, vuelve a intentarlo...");
+      return;
+    }
+    dispatch(setGlobalUser(userJSON));
+    setCommentList(data.comments.reverse());
+  };
+
   return (
     <article
       id={comment._id}
@@ -126,7 +169,9 @@ export const Comment = ({ comment, setCommentList }) => {
             {comment.date.split("T")[1].split(":")[0] - 3}:
             {comment.date.split("T")[1].split(":")[1]}
           </time>
-          <MoreVertIcon className="cursor-pointer" onClick={handleClick} />
+          {userGlobal && (
+            <MoreVertIcon className="cursor-pointer" onClick={handleClick} />
+          )}
           <Menu
             id="basic-menu"
             anchorEl={anchorEl}
@@ -144,11 +189,7 @@ export const Comment = ({ comment, setCommentList }) => {
             >
               <EditIcon /> Editar
             </MenuItem>
-            <MenuItem
-              onClick={() => {
-                setAnchorEl(null);
-              }}
-            >
+            <MenuItem onClick={deleteComment}>
               <DeleteIcon /> Eliminar
             </MenuItem>
           </Menu>

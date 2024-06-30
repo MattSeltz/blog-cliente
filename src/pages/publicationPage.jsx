@@ -43,6 +43,7 @@ export const PublicationPage = () => {
       const res = await postData("/comment", {
         author: userGlobal._id,
         content,
+        publication: publication?._id,
         date: new Date().toISOString(),
       });
       const data = await res.json();

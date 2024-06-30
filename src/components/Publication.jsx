@@ -14,7 +14,12 @@ import { useDispatch, useSelector } from "react-redux";
 import { useState, useEffect } from "react";
 
 import { setGlobalUser } from "../contexts/userSlice";
-import { getData, getOneData, updateData } from "../services/services";
+import {
+  getData,
+  getOneData,
+  updateData,
+  deleteData,
+} from "../services/services";
 import { PublicationEdit } from "./PublicationEdit";
 
 export const Publication = ({ publication, setPublicationList }) => {
@@ -98,6 +103,49 @@ export const Publication = ({ publication, setPublicationList }) => {
     }
   };
 
+  const deletePublication = async () => {
+    const { comments } = await getOneData("/publication/", publication._id);
+    comments.forEach(async (item) => {
+      const deleteCommentRes = await deleteData("/comment/", item._id);
+      if (deleteCommentRes.status.toLocaleString().startsWith("4")) {
+        alert("Ha ocurrido un error inesperado, vuelve a intentarlo...");
+        return;
+      }
+    });
+    const user = await getOneData("/auth/", userGlobal._id);
+    const filteredLikes = user.likes.filter(
+      (item) => item._id !== publication._id
+    );
+    const filteredUserPublications = user.publications.filter(
+      (item) => item._id !== publication._id
+    );
+    const commentLikes = user.commentLikes.filter(
+      (item) => item.publication[0]._id !== publication._id
+    );
+    const filteredUser = user.comments.filter(
+      (item) => item.publication[0]._id !== publication._id
+    );
+    const userRes = await updateData("/auth/like/", userGlobal._id, {
+      likes: filteredLikes,
+      comments: filteredUser,
+      commentLikes,
+      publications: filteredUserPublications,
+    });
+    const userJSON = await userRes.json();
+    if (userRes.status.toLocaleString().startsWith("4")) {
+      alert("Ha ocurrido un error inesperado, vuelve a intentarlo...");
+      return;
+    }
+    const deleteRes = await deleteData("/publication/", publication._id);
+    if (deleteRes.status.toLocaleString().startsWith("4")) {
+      alert("Ha ocurrido un error inesperado, vuelve a intentarlo...");
+      return;
+    }
+    const currentPublication = await getData("/publication");
+    dispatch(setGlobalUser(userJSON));
+    setPublicationList(currentPublication.reverse());
+  };
+
   return (
     <article
       id={publication._id}
@@ -123,7 +171,9 @@ export const Publication = ({ publication, setPublicationList }) => {
             {publication.date.split("T")[1].split(":")[0] - 3}:
             {publication.date.split("T")[1].split(":")[1]}
           </time>
-          <MoreVertIcon className="cursor-pointer" onClick={handleClick} />
+          {userGlobal && (
+            <MoreVertIcon className="cursor-pointer" onClick={handleClick} />
+          )}
           <Menu
             id="basic-menu"
             anchorEl={anchorEl}
@@ -141,11 +191,7 @@ export const Publication = ({ publication, setPublicationList }) => {
             >
               <EditIcon /> Editar
             </MenuItem>
-            <MenuItem
-              onClick={() => {
-                setAnchorEl(null);
-              }}
-            >
+            <MenuItem onClick={deletePublication}>
               <DeleteIcon /> Eliminar
             </MenuItem>
           </Menu>
