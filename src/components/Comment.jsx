@@ -1,6 +1,11 @@
 import { Avatar, Divider } from "@mui/material";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import FavoriteIcon from "@mui/icons-material/Favorite";
+import MoreVertIcon from "@mui/icons-material/MoreVert";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
+import Menu from "@mui/material/Menu";
+import MenuItem from "@mui/material/MenuItem";
 
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
@@ -8,6 +13,7 @@ import { useSelector, useDispatch } from "react-redux";
 
 import { getOneData, updateData } from "../services/services";
 import { setGlobalUser } from "../contexts/userSlice";
+import { CommentEdit } from "./CommentEdit";
 
 export const Comment = ({ comment, setCommentList }) => {
   const userGlobal = useSelector((state) => state.user.value);
@@ -15,6 +21,14 @@ export const Comment = ({ comment, setCommentList }) => {
   const dispatch = useDispatch();
 
   const [isLiked, setIsLiked] = useState(false);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [isOpen, setIsOpen] = useState(false);
+
+  const open = Boolean(anchorEl);
+
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
 
   useEffect(() => {
     const isMatch = comment.likes.filter(
@@ -106,12 +120,46 @@ export const Comment = ({ comment, setCommentList }) => {
             </Link>
           </p>
         </div>
-        <time dateTime={comment.date} className="text-gray-500">
-          {comment.date.split("T")[0]}{" "}
-          {comment.date.split("T")[1].split(":")[0] - 3}:
-          {comment.date.split("T")[1].split(":")[1]}
-        </time>
+        <div className="flex items-center">
+          <time dateTime={comment.date} className="text-gray-500">
+            {comment.date.split("T")[0]}{" "}
+            {comment.date.split("T")[1].split(":")[0] - 3}:
+            {comment.date.split("T")[1].split(":")[1]}
+          </time>
+          <MoreVertIcon className="cursor-pointer" onClick={handleClick} />
+          <Menu
+            id="basic-menu"
+            anchorEl={anchorEl}
+            open={open}
+            onClose={() => setAnchorEl(null)}
+            MenuListProps={{
+              "aria-labelledby": "basic-button",
+            }}
+          >
+            <MenuItem
+              onClick={() => {
+                setAnchorEl(null);
+                setIsOpen(true);
+              }}
+            >
+              <EditIcon /> Editar
+            </MenuItem>
+            <MenuItem
+              onClick={() => {
+                setAnchorEl(null);
+              }}
+            >
+              <DeleteIcon /> Eliminar
+            </MenuItem>
+          </Menu>
+        </div>
       </div>
+      <CommentEdit
+        isOpen={isOpen}
+        setIsOpen={setIsOpen}
+        comment={comment}
+        setCommentList={setCommentList}
+      />
       <div className="group relative w-full">
         <p className="mt-5 line-clamp-3 text-sm leading-6 text-gray-600">
           {comment.content}

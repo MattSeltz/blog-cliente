@@ -3,6 +3,11 @@ import FavoriteIcon from "@mui/icons-material/Favorite";
 import ChatBubbleOutlineIcon from "@mui/icons-material/ChatBubbleOutline";
 import Divider from "@mui/material/Divider";
 import Avatar from "@mui/material/Avatar";
+import MoreVertIcon from "@mui/icons-material/MoreVert";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
+import Menu from "@mui/material/Menu";
+import MenuItem from "@mui/material/MenuItem";
 
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
@@ -10,6 +15,7 @@ import { useState, useEffect } from "react";
 
 import { setGlobalUser } from "../contexts/userSlice";
 import { getData, getOneData, updateData } from "../services/services";
+import { PublicationEdit } from "./PublicationEdit";
 
 export const Publication = ({ publication, setPublicationList }) => {
   const userGlobal = useSelector((state) => state.user.value);
@@ -17,6 +23,14 @@ export const Publication = ({ publication, setPublicationList }) => {
   const dispatch = useDispatch();
 
   const [isLiked, setIsLiked] = useState(false);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [isOpen, setIsOpen] = useState(false);
+
+  const open = Boolean(anchorEl);
+
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
 
   useEffect(() => {
     const isMatch = publication.likes.filter(
@@ -103,12 +117,46 @@ export const Publication = ({ publication, setPublicationList }) => {
             </p>
           </div>
         )}
-        <time dateTime={publication.date} className="text-gray-500">
-          {publication.date.split("T")[0]}{" "}
-          {publication.date.split("T")[1].split(":")[0] - 3}:
-          {publication.date.split("T")[1].split(":")[1]}
-        </time>
+        <div className="flex items-center">
+          <time dateTime={publication.date} className="text-gray-500">
+            {publication.date.split("T")[0]}{" "}
+            {publication.date.split("T")[1].split(":")[0] - 3}:
+            {publication.date.split("T")[1].split(":")[1]}
+          </time>
+          <MoreVertIcon className="cursor-pointer" onClick={handleClick} />
+          <Menu
+            id="basic-menu"
+            anchorEl={anchorEl}
+            open={open}
+            onClose={() => setAnchorEl(null)}
+            MenuListProps={{
+              "aria-labelledby": "basic-button",
+            }}
+          >
+            <MenuItem
+              onClick={() => {
+                setAnchorEl(null);
+                setIsOpen(true);
+              }}
+            >
+              <EditIcon /> Editar
+            </MenuItem>
+            <MenuItem
+              onClick={() => {
+                setAnchorEl(null);
+              }}
+            >
+              <DeleteIcon /> Eliminar
+            </MenuItem>
+          </Menu>
+        </div>
       </div>
+      <PublicationEdit
+        isOpen={isOpen}
+        setIsOpen={setIsOpen}
+        publication={publication}
+        setPublicationList={setPublicationList}
+      />
       <div className="group relative w-full">
         <h3 className="mt-3 text-lg font-semibold leading-6 text-gray-900 ">
           {publication.title}
