@@ -33,7 +33,39 @@ export const Edit = () => {
   const [isMatch, setIsMatch] = useState(true);
   const [errorMessage, setErrorMessage] = useState(false);
 
-  const deleteAccount = async () => {};
+  const deleteAccount = async () => {
+    const comments = await getData("/comment");
+    comments.forEach(async (item) => {
+      if (item.author[0]._id === userGlobal._id) {
+        const deleteCommentRes = await deleteData("/comment/", item._id);
+        if (deleteCommentRes.status.toLocaleString().startsWith("4")) {
+          alert("Ha ocurrido un error inesperado, vuelve a intentarlo...");
+          return;
+        }
+      }
+    });
+    const publications = await getData("/publication");
+    publications.forEach(async (item) => {
+      if (item.author[0]._id === userGlobal._id) {
+        const deletePublicationRes = await deleteData(
+          "/publication/",
+          item._id
+        );
+        if (deletePublicationRes.status.toLocaleString().startsWith("4")) {
+          alert("Ha ocurrido un error inesperado, vuelve a intentarlo...");
+          return;
+        }
+      }
+    });
+    const user = await deleteData("/auth/user/", userGlobal._id);
+    if (user.status.toLocaleString().startsWith("4")) {
+      alert("Ha ocurrido un error inesperado, vuelve a intentarlo...");
+      return;
+    }
+    sessionStorage.removeItem("globalUser");
+    dispatch(setGlobalUser(null));
+    navigate("/");
+  };
 
   const updateAccount = async (e) => {
     e.preventDefault();
