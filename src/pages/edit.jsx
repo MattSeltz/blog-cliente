@@ -62,6 +62,7 @@ export const Edit = () => {
       alert("Ha ocurrido un error inesperado, vuelve a intentarlo...");
       return;
     }
+    localStorage.removeItem("globalUser");
     sessionStorage.removeItem("globalUser");
     dispatch(setGlobalUser(null));
     navigate("/");

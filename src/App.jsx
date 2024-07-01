@@ -9,11 +9,12 @@ export const App = () => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    const user = JSON.parse(sessionStorage.getItem("globalUser"));
+    const sessionUser = JSON.parse(sessionStorage.getItem("globalUser"));
+    const user = JSON.parse(localStorage.getItem("globalUser"));
 
-    if (!user) return;
+    if (!user && !sessionUser) return;
 
-    getOneData("/auth/", user._id)
+    getOneData("/auth/", user?._id ?? sessionUser?._id)
       .then((res) => dispatch(setGlobalUser(res)))
       .catch((e) => console.error(e));
   }, []);

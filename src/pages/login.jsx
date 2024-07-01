@@ -4,6 +4,8 @@ import { useDispatch } from "react-redux";
 
 import CircularProgress from "@mui/material/CircularProgress";
 import { green } from "@mui/material/colors";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import Checkbox from "@mui/material/Checkbox";
 import Box from "@mui/material/Box";
 
 import { postData } from "../services/services";
@@ -15,6 +17,7 @@ export const Login = () => {
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [remember, setRemember] = useState(true);
   const [errorMessage, setErrorMessage] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isMatch, setIsMatch] = useState(true);
@@ -31,7 +34,11 @@ export const Login = () => {
       const data = await res.json();
 
       if (res.status.toLocaleString().startsWith("2")) {
-        sessionStorage.setItem("globalUser", JSON.stringify(data));
+        if (remember) {
+          localStorage.setItem("globalUser", JSON.stringify(data));
+        } else {
+          sessionStorage.setItem("globalUser", JSON.stringify(data));
+        }
         dispatch(setGlobalUser(data));
         navigate("/");
       } else {
@@ -155,6 +162,16 @@ export const Login = () => {
               )}
             </Box>
           </Box>
+          <FormControlLabel
+            control={
+              <Checkbox
+                defaultChecked
+                value={remember}
+                onChange={(e) => setRemember(e.target.checked)}
+              />
+            }
+            label="Recordarme"
+          />
         </form>
 
         <p className="mt-10 text-center text-sm text-gray-500">

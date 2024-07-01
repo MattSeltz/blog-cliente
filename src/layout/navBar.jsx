@@ -88,6 +88,7 @@ export const NavBar = () => {
     if (res.status.toLocaleString().startsWith("2")) {
       setMobileMoreAnchorEl(null);
       dispatch(setGlobalUser(null));
+      localStorage.removeItem("globalUser");
       sessionStorage.removeItem("globalUser");
       navigate("/");
     } else {
