@@ -6,8 +6,14 @@ export const getData = async uri => {
       method:"GET",
       credentials: "include"
     })
-  const data = await res.json()
-  return data
+
+    const data = await res.json()
+
+    if(res.ok) {
+      return data
+    }else{
+      return false
+    }
   } catch (error) {
     console.error(error)
   }
@@ -19,8 +25,14 @@ export const getOneData = async (uri,id) => {
       method:"GET",
       credentials: "include"
     })
+    
     const data = await res.json()
-    return data
+
+    if(res.ok) {
+      return data
+    }else{
+      return false
+    }
   } catch (error) {
     console.error(error)
   }
@@ -37,7 +49,13 @@ export const postData = async (uri,data) => {
       credentials: "include"
     })
 
-    return res
+    const data = await res.json()
+
+    if(res.ok) {
+      return data
+    }else{
+      return false
+    }
   } catch (error) {
     console.error(error)
   }
@@ -54,7 +72,13 @@ export const updateData = async (uri,id,data) => {
       credentials: "include"
     })
 
-    return res
+    const data = await res.json()
+
+    if(res.ok) {
+      return data
+    }else{
+      return false
+    }
   } catch (error) {
     console.error(error)
   }
@@ -67,7 +91,13 @@ export const deleteData = async (uri,id) => {
       credentials: "include"
     })
 
-    return res
+    const data = await res.json()
+
+    if(res.ok) {
+      return data
+    }else{
+      return false
+    }
   } catch (error) {
     console.error(error)
   }

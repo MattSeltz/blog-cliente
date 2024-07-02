@@ -1,9 +1,8 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 
-import CircularProgress from "@mui/material/CircularProgress";
 import { green } from "@mui/material/colors";
-import Box from "@mui/material/Box";
+import { CircularProgress, Box } from "@mui/material";
 
 import { postData } from "../services/services";
 
@@ -25,17 +24,13 @@ export const Register = () => {
       setIsLoading(true);
       setIsMatch(true);
 
-      const res = await postData("/auth/register", {
+      await postData("/auth/register", {
         username,
         email,
         password,
       });
 
-      if (res.status.toLocaleString().startsWith("2")) {
-        navigate("/login");
-      } else {
-        setIsMatch(false);
-      }
+      navigate("/login");
 
       setUsername("");
       setEmail("");

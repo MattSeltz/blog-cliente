@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 
-import Button from "@mui/material/Button";
+import { Button } from "@mui/material";
 
 import { getData } from "../services/services";
 import { Publication } from "../components/Publication";

@@ -2,10 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 
-import Button from "@mui/material/Button";
-import TextField from "@mui/material/TextField";
-import CircularProgress from "@mui/material/CircularProgress";
-import Box from "@mui/material/Box";
+import { Button, TextField, CircularProgress, Box } from "@mui/material";
 
 import { getOneData, postData, updateData } from "../services/services";
 import { Comment } from "../components/Comment";
@@ -40,54 +37,34 @@ export const PublicationPage = () => {
       setIsLoading(true);
       setErrorMessage(false);
 
-      const res = await postData("/comment", {
+      const data = await postData("/comment", {
         author: userGlobal._id,
         content,
         publication: publication?._id,
         date: new Date().toISOString(),
       });
-      const data = await res.json();
 
-      if (res.status.toLocaleString().startsWith("4")) {
-        alert("Ha ocurrido un error inesperado, vuelve a intentarlo...");
-        return;
-      }
-
-      const publicationToEdit = await getOneData(
+      const { comments } = await getOneData(
         "/publication/",
         location.pathname.split("/")[2]
       );
-      publicationToEdit.comments.push(data._id);
-      const publicationStatus = await updateData(
-        "/publication/",
-        location.pathname.split("/")[2],
-        {
-          comments: publicationToEdit.comments,
-        }
-      );
-      if (publicationStatus.status.toLocaleString().startsWith("4")) {
-        alert("Ha ocurrido un error inesperado, vuelve a intentarlo...");
-        return;
-      }
+      comments.push(data._id);
+      await updateData("/publication/", location.pathname.split("/")[2], {
+        comments,
+      });
 
-      const user = await getOneData("/auth/", userGlobal._id);
+      const user = await getOneData("/user/", userGlobal._id);
       user.comments.push(data._id);
-      const resStatus = await updateData("/auth/like/", userGlobal._id, {
+      await updateData("/user/", userGlobal._id, {
         comments: user.comments,
       });
-      if (resStatus.status.toLocaleString().startsWith("4")) {
-        alert("Ha ocurrido un error inesperado, vuelve a intentarlo...");
-        return;
-      }
 
       const currentPublication = await getOneData(
         "/publication/",
         location.pathname.split("/")[2]
       );
 
-      const currentComment = currentPublication.comments;
-
-      setCommentList(currentComment.reverse());
+      setCommentList(currentPublication.comments.reverse());
       setContent("");
       setIsLoading(false);
     } else {

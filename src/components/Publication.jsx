@@ -1,13 +1,12 @@
-import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
-import FavoriteIcon from "@mui/icons-material/Favorite";
-import ChatBubbleOutlineIcon from "@mui/icons-material/ChatBubbleOutline";
-import Divider from "@mui/material/Divider";
-import Avatar from "@mui/material/Avatar";
-import MoreVertIcon from "@mui/icons-material/MoreVert";
-import EditIcon from "@mui/icons-material/Edit";
-import DeleteIcon from "@mui/icons-material/Delete";
-import Menu from "@mui/material/Menu";
-import MenuItem from "@mui/material/MenuItem";
+import {
+  FavoriteBorderIcon,
+  FavoriteIcon,
+  ChatBubbleOutlineIcon,
+  MoreVertIcon,
+  EditIcon,
+  DeleteIcon,
+} from "@mui/icons-material";
+import { Divider, Avatar, Menu, MenuItem } from "@mui/material";
 
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
@@ -33,10 +32,6 @@ export const Publication = ({ publication, setPublicationList }) => {
 
   const open = Boolean(anchorEl);
 
-  const handleClick = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
-
   useEffect(() => {
     const isMatch = publication.likes.filter(
       (item) => item._id === userGlobal?._id
@@ -55,64 +50,47 @@ export const Publication = ({ publication, setPublicationList }) => {
     if (like) {
       const { likes } = await getOneData("/publication/", publication._id);
       likes.push(userGlobal._id);
-      const resStatus = await updateData("/publication/", publication._id, {
+      await updateData("/publication/", publication._id, {
         likes,
       });
-      if (resStatus.status.toLocaleString().startsWith("4")) {
-        alert("Ha ocurrido un error inesperado, vuelve a intentarlo...");
-        return;
-      }
-      const user = await getOneData("/auth/", userGlobal._id);
+
+      const user = await getOneData("/user/", userGlobal._id);
       user.likes.push(publication._id);
-      const userStatus = await updateData("/auth/like/", userGlobal._id, {
+      const userJSON = await updateData("/user/", userGlobal._id, {
         likes: user.likes,
       });
-      const userJSON = await userStatus.json();
-      if (userStatus.status.toLocaleString().startsWith("4")) {
-        alert("Ha ocurrido un error inesperado, vuelve a intentarlo...");
-        return;
-      }
+
+      const res = await getData("/publication");
+
       dispatch(setGlobalUser(userJSON));
-      const resData = await getData("/publication");
-      setPublicationList(resData.reverse());
+      setPublicationList(res.reverse());
       setIsLiked(like);
     } else {
       const { likes } = await getOneData("/publication/", publication._id);
       const disLike = likes.filter((item) => item._id !== userGlobal._id);
-      const resStatus = await updateData("/publication/", publication._id, {
+      await updateData("/publication/", publication._id, {
         likes: disLike,
       });
-      if (resStatus.status.toLocaleString().startsWith("4")) {
-        alert("Ha ocurrido un error inesperado, vuelve a intentarlo...");
-        return;
-      }
-      const user = await getOneData("/auth/", userGlobal._id);
+
+      const user = await getOneData("/user/", userGlobal._id);
       const disLikeUser = user.likes.filter((item) => item !== publication._id);
-      const userStatus = await updateData("/auth/like/", userGlobal._id, {
+      const userJSON = await updateData("/user/", userGlobal._id, {
         likes: disLikeUser,
       });
-      const userJSON = await userStatus.json();
-      if (userStatus.status.toLocaleString().startsWith("4")) {
-        alert("Ha ocurrido un error inesperado, vuelve a intentarlo...");
-        return;
-      }
+
+      const res = await getData("/publication");
+
       dispatch(setGlobalUser(userJSON));
-      const resData = await getData("/publication");
-      setPublicationList(resData.reverse());
+      setPublicationList(res.reverse());
       setIsLiked(like);
     }
   };
 
   const deletePublication = async () => {
     const { comments } = await getOneData("/publication/", publication._id);
-    comments.forEach(async (item) => {
-      const deleteCommentRes = await deleteData("/comment/", item._id);
-      if (deleteCommentRes.status.toLocaleString().startsWith("4")) {
-        alert("Ha ocurrido un error inesperado, vuelve a intentarlo...");
-        return;
-      }
-    });
-    const user = await getOneData("/auth/", userGlobal._id);
+    comments.forEach(async (item) => await deleteData("/comment/", item._id));
+
+    const user = await getOneData("/user/", userGlobal._id);
     const filteredLikes = user.likes.filter(
       (item) => item._id !== publication._id
     );
@@ -125,25 +103,18 @@ export const Publication = ({ publication, setPublicationList }) => {
     const filteredUser = user.comments.filter(
       (item) => item.publication[0]._id !== publication._id
     );
-    const userRes = await updateData("/auth/like/", userGlobal._id, {
+    const userJSON = await updateData("/user/", userGlobal._id, {
       likes: filteredLikes,
       comments: filteredUser,
       commentLikes,
       publications: filteredUserPublications,
     });
-    const userJSON = await userRes.json();
-    if (userRes.status.toLocaleString().startsWith("4")) {
-      alert("Ha ocurrido un error inesperado, vuelve a intentarlo...");
-      return;
-    }
-    const deleteRes = await deleteData("/publication/", publication._id);
-    if (deleteRes.status.toLocaleString().startsWith("4")) {
-      alert("Ha ocurrido un error inesperado, vuelve a intentarlo...");
-      return;
-    }
-    const currentPublication = await getData("/publication");
+
+    await deleteData("/publication/", publication._id);
+
+    const res = await getData("/publication");
     dispatch(setGlobalUser(userJSON));
-    setPublicationList(currentPublication.reverse());
+    setPublicationList(res.reverse());
   };
 
   return (
@@ -172,7 +143,10 @@ export const Publication = ({ publication, setPublicationList }) => {
             {publication.date.split("T")[1].split(":")[1]}
           </time>
           {userGlobal && (
-            <MoreVertIcon className="cursor-pointer" onClick={handleClick} />
+            <MoreVertIcon
+              className="cursor-pointer"
+              onClick={(e) => setAnchorEl(e.currentTarget)}
+            />
           )}
           <Menu
             id="basic-menu"

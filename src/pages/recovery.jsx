@@ -1,9 +1,8 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 
-import CircularProgress from "@mui/material/CircularProgress";
 import { green } from "@mui/material/colors";
-import Box from "@mui/material/Box";
+import { CircularProgress, Box } from "@mui/material";
 
 import { postData } from "../services/services";
 
@@ -23,13 +22,9 @@ export const Recovery = () => {
       setIsLoading(true);
       setIsMatch(true);
 
-      const res = await postData("/email/recovery", { email });
+      await postData("/email/recovery", { email });
 
-      if (res.status.toLocaleString().startsWith("2")) {
-        setSuccessMessage(true);
-      } else {
-        setIsMatch(false);
-      }
+      setSuccessMessage(true);
 
       setEmail("");
       setIsLoading(false);

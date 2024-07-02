@@ -1,11 +1,7 @@
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
-import Button from "@mui/material/Button";
-import Modal from "@mui/material/Modal";
-import TextField from "@mui/material/TextField";
-import CircularProgress from "@mui/material/CircularProgress";
-import Box from "@mui/material/Box";
+import { Button, Modal, TextField, CircularProgress, Box } from "@mui/material";
 
 import {
   postData,
@@ -45,33 +41,23 @@ export const PublicationForm = ({ open, setOpen, setPublicationList }) => {
       setIsLoading(true);
       setErrorMessage(false);
 
-      const res = await postData("/publication", {
+      const data = await postData("/publication", {
         author: userGlobal._id,
         title,
         content,
         date: new Date().toISOString(),
       });
-      const data = await res.json();
 
-      if (res.status.toLocaleString().startsWith("4")) {
-        alert("Ha ocurrido un error inesperado, vuelve a intentarlo...");
-        return;
-      }
-
-      const user = await getOneData("/auth/", userGlobal._id);
+      const user = await getOneData("/user/", userGlobal._id);
       user.publications.push(data._id);
-      const resStatus = await updateData("/auth/like/", userGlobal._id, {
+      await updateData("/user/", userGlobal._id, {
         publications: user.publications,
       });
-      if (resStatus.status.toLocaleString().startsWith("4")) {
-        alert("Ha ocurrido un error inesperado, vuelve a intentarlo...");
-        return;
-      }
 
-      const publicationList = await getData("/publication");
+      const res = await getData("/publication");
 
       dispatch(setGlobalUser(user));
-      setPublicationList(publicationList.reverse());
+      setPublicationList(res.reverse());
       setTitle("");
       setContent("");
       setOpen(false);

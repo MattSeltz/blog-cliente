@@ -2,11 +2,13 @@ import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useDispatch } from "react-redux";
 
-import CircularProgress from "@mui/material/CircularProgress";
 import { green } from "@mui/material/colors";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import Checkbox from "@mui/material/Checkbox";
-import Box from "@mui/material/Box";
+import {
+  FormControlLabel,
+  Checkbox,
+  CircularProgress,
+  Box,
+} from "@mui/material";
 
 import { postData } from "../services/services";
 import { setGlobalUser } from "../contexts/userSlice";
@@ -30,20 +32,16 @@ export const Login = () => {
       setIsLoading(true);
       setIsMatch(true);
 
-      const res = await postData("/auth/login", { username, password });
-      const data = await res.json();
+      const data = await postData("/auth/login", { username, password });
 
-      if (res.status.toLocaleString().startsWith("2")) {
-        if (remember) {
-          localStorage.setItem("globalUser", JSON.stringify(data));
-        } else {
-          sessionStorage.setItem("globalUser", JSON.stringify(data));
-        }
-        dispatch(setGlobalUser(data));
-        navigate("/");
+      if (remember) {
+        localStorage.setItem("globalUser", JSON.stringify(data));
       } else {
-        setIsMatch(false);
+        sessionStorage.setItem("globalUser", JSON.stringify(data));
       }
+
+      dispatch(setGlobalUser(data));
+      navigate("/");
 
       setUsername("");
       setPassword("");

@@ -1,24 +1,21 @@
-import CircularProgress from "@mui/material/CircularProgress";
 import { green } from "@mui/material/colors";
-import Button from "@mui/material/Button";
-import Dialog from "@mui/material/Dialog";
-import DialogActions from "@mui/material/DialogActions";
-import DialogContent from "@mui/material/DialogContent";
-import DialogContentText from "@mui/material/DialogContentText";
-import DialogTitle from "@mui/material/DialogTitle";
-import Box from "@mui/material/Box";
+import {
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  CircularProgress,
+  Box,
+} from "@mui/material";
 
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 
 import { setGlobalUser } from "../contexts/userSlice";
-import {
-  getData,
-  getOneData,
-  updateData,
-  deleteData,
-} from "../services/services";
+import { getData, updateData, deleteData } from "../services/services";
 
 export const Edit = () => {
   const userGlobal = useSelector((state) => state.user.value);
@@ -37,31 +34,19 @@ export const Edit = () => {
     const comments = await getData("/comment");
     comments.forEach(async (item) => {
       if (item.author[0]._id === userGlobal._id) {
-        const deleteCommentRes = await deleteData("/comment/", item._id);
-        if (deleteCommentRes.status.toLocaleString().startsWith("4")) {
-          alert("Ha ocurrido un error inesperado, vuelve a intentarlo...");
-          return;
-        }
+        await deleteData("/comment/", item._id);
       }
     });
+
     const publications = await getData("/publication");
     publications.forEach(async (item) => {
       if (item.author[0]._id === userGlobal._id) {
-        const deletePublicationRes = await deleteData(
-          "/publication/",
-          item._id
-        );
-        if (deletePublicationRes.status.toLocaleString().startsWith("4")) {
-          alert("Ha ocurrido un error inesperado, vuelve a intentarlo...");
-          return;
-        }
+        await deleteData("/publication/", item._id);
       }
     });
-    const user = await deleteData("/auth/user/", userGlobal._id);
-    if (user.status.toLocaleString().startsWith("4")) {
-      alert("Ha ocurrido un error inesperado, vuelve a intentarlo...");
-      return;
-    }
+
+    await deleteData("/user/", userGlobal._id);
+
     localStorage.removeItem("globalUser");
     sessionStorage.removeItem("globalUser");
     dispatch(setGlobalUser(null));
@@ -77,19 +62,14 @@ export const Edit = () => {
         setIsLoading(true);
         setIsMatch(true);
 
-        const res = await updateData("/auth/user/", userGlobal._id, {
+        const data = await updateData("/user/", userGlobal._id, {
           password,
           username,
         });
-        const data = await res.json();
 
-        if (res.status.toLocaleString().startsWith("2")) {
-          sessionStorage.setItem("globalUser", JSON.stringify(data));
-          dispatch(setGlobalUser(data));
-          navigate("/");
-        } else {
-          alert("Ha ocurrido un error inesperado, vuelve a intentarlo...");
-        }
+        sessionStorage.setItem("globalUser", JSON.stringify(data));
+        dispatch(setGlobalUser(data));
+        navigate("/");
 
         setIsLoading(false);
       } else {

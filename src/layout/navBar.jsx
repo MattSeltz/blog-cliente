@@ -3,28 +3,32 @@ import { useSelector, useDispatch } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 
 import { styled, alpha } from "@mui/material/styles";
-import AppBar from "@mui/material/AppBar";
-import Toolbar from "@mui/material/Toolbar";
-import IconButton from "@mui/material/IconButton";
-import Typography from "@mui/material/Typography";
-import InputBase from "@mui/material/InputBase";
-import MenuItem from "@mui/material/MenuItem";
-import Menu from "@mui/material/Menu";
-import SearchIcon from "@mui/icons-material/Search";
-import AccountCircle from "@mui/icons-material/AccountCircle";
-import MoreIcon from "@mui/icons-material/MoreVert";
-import HomeIcon from "@mui/icons-material/Home";
-import LoginIcon from "@mui/icons-material/Login";
-import CreateIcon from "@mui/icons-material/Create";
-import LogoutIcon from "@mui/icons-material/Logout";
-import List from "@mui/material/List";
-import ListItem from "@mui/material/ListItem";
-import ListItemButton from "@mui/material/ListItemButton";
-import ListItemIcon from "@mui/material/ListItemIcon";
-import ListItemText from "@mui/material/ListItemText";
-import Divider from "@mui/material/Divider";
-import Avatar from "@mui/material/Avatar";
-import Box from "@mui/material/Box";
+import {
+  SearchIcon,
+  AccountCircle,
+  MoreIcon,
+  HomeIcon,
+  LoginIcon,
+  CreateIcon,
+  LogoutIcon,
+} from "@mui/icons-material";
+import {
+  AppBar,
+  Toolbar,
+  IconButton,
+  Typography,
+  InputBase,
+  MenuItem,
+  Menu,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+  Divider,
+  Avatar,
+  Box,
+} from "@mui/material";
 
 import { deleteData, getData } from "../services/services";
 import { setGlobalUser } from "../contexts/userSlice";
@@ -77,23 +81,19 @@ export const NavBar = () => {
   const [userListToSearch, setUserListToSearch] = useState(null);
 
   useEffect(() => {
-    getData("/auth")
+    getData("/user")
       .then((res) => setUserListToSearch(res))
       .catch((e) => console.error(e));
   }, []);
 
   const logout = async () => {
-    const res = await deleteData("/auth/logout/", 0);
+    await deleteData("/auth/logout/", 0);
 
-    if (res.status.toLocaleString().startsWith("2")) {
-      setMobileMoreAnchorEl(null);
-      dispatch(setGlobalUser(null));
-      localStorage.removeItem("globalUser");
-      sessionStorage.removeItem("globalUser");
-      navigate("/");
-    } else {
-      alert("Ha ocurrido un error inesperado, vuelve a intentarlo...");
-    }
+    setMobileMoreAnchorEl(null);
+    dispatch(setGlobalUser(null));
+    localStorage.removeItem("globalUser");
+    sessionStorage.removeItem("globalUser");
+    navigate("/");
   };
 
   const search = (e) => {

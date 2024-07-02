@@ -1,8 +1,4 @@
-import Button from "@mui/material/Button";
-import Modal from "@mui/material/Modal";
-import TextField from "@mui/material/TextField";
-import CircularProgress from "@mui/material/CircularProgress";
-import Box from "@mui/material/Box";
+import { Button, Modal, TextField, CircularProgress, Box } from "@mui/material";
 
 import { useState, useEffect } from "react";
 
@@ -45,19 +41,14 @@ export const PublicationEdit = ({
       setIsLoading(true);
       setErrorMessage(false);
 
-      const res = await updateData("/publication/", publication._id, {
+      await updateData("/publication/", publication._id, {
         title,
         content,
       });
 
-      if (res.status.toLocaleString().startsWith("4")) {
-        alert("Ha ocurrido un error inesperado, vuelve a intentarlo...");
-        return;
-      }
+      const res = await getData("/publication");
 
-      const publicationList = await getData("/publication");
-
-      setPublicationList(publicationList.reverse());
+      setPublicationList(res.reverse());
       setTitle("");
       setContent("");
       setIsOpen(false);

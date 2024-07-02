@@ -1,9 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-import CircularProgress from "@mui/material/CircularProgress";
 import { green } from "@mui/material/colors";
-import Box from "@mui/material/Box";
+import { CircularProgress, Box } from "@mui/material";
 
 import { updateData } from "../services/services";
 
@@ -25,15 +24,11 @@ export const RecoveryAccount = () => {
         setIsLoading(true);
         setIsMatch(true);
 
-        let id = location.pathname.split("/")[2];
+        await updateData("/auth/recovery/", location.pathname.split("/")[2], {
+          password,
+        });
 
-        const res = await updateData("/auth/recovery/", id, { password });
-
-        if (res.status.toLocaleString().startsWith("2")) {
-          navigate("/login");
-        } else {
-          alert("Ha ocurrido un error inesperado, vuelve a intentarlo...");
-        }
+        navigate("/login");
 
         setIsLoading(false);
       } else {

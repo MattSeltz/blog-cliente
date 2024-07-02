@@ -1,11 +1,11 @@
-import { Avatar, Divider } from "@mui/material";
-import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
-import FavoriteIcon from "@mui/icons-material/Favorite";
-import MoreVertIcon from "@mui/icons-material/MoreVert";
-import EditIcon from "@mui/icons-material/Edit";
-import DeleteIcon from "@mui/icons-material/Delete";
-import Menu from "@mui/material/Menu";
-import MenuItem from "@mui/material/MenuItem";
+import { Avatar, Divider, Menu, MenuItem } from "@mui/material";
+import {
+  FavoriteBorderIcon,
+  FavoriteIcon,
+  MoreVertIcon,
+  EditIcon,
+  DeleteIcon,
+} from "@mui/icons-material";
 
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
@@ -26,10 +26,6 @@ export const Comment = ({ comment, setCommentList }) => {
 
   const open = Boolean(anchorEl);
 
-  const handleClick = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
-
   useEffect(() => {
     const isMatch = comment.likes.filter(
       (item) => item._id === userGlobal?._id
@@ -47,68 +43,53 @@ export const Comment = ({ comment, setCommentList }) => {
     if (like) {
       const { likes } = await getOneData("/comment/", comment._id);
       likes.push(userGlobal._id);
-      const resStatus = await updateData("/comment/", comment._id, {
+      await updateData("/comment/", comment._id, {
         likes,
       });
-      if (resStatus.status.toLocaleString().startsWith("4")) {
-        alert("Ha ocurrido un error inesperado, vuelve a intentarlo...");
-        return;
-      }
-      const user = await getOneData("/auth/", userGlobal._id);
+
+      const user = await getOneData("/user/", userGlobal._id);
       user.commentLikes.push(comment._id);
-      const userStatus = await updateData("/auth/like/", userGlobal._id, {
+      const userJSON = await updateData("/user/", userGlobal._id, {
         commentLikes: user.commentLikes,
       });
-      const userJSON = await userStatus.json();
-      if (userStatus.status.toLocaleString().startsWith("4")) {
-        alert("Ha ocurrido un error inesperado, vuelve a intentarlo...");
-        return;
-      }
-      dispatch(setGlobalUser(userJSON));
-      const resData = await getOneData(
+
+      const { comments } = await getOneData(
         "/publication/",
         location.pathname.split("/")[2]
       );
-      setCommentList(resData.comments.reverse());
+
+      dispatch(setGlobalUser(userJSON));
+      setCommentList(comments.reverse());
       setIsLiked(like);
     } else {
       const { likes } = await getOneData("/comment/", comment._id);
       const disLike = likes.filter((item) => item._id !== userGlobal._id);
-      const resStatus = await updateData("/comment/", comment._id, {
+      await updateData("/comment/", comment._id, {
         likes: disLike,
       });
-      if (resStatus.status.toLocaleString().startsWith("4")) {
-        alert("Ha ocurrido un error inesperado, vuelve a intentarlo...");
-        return;
-      }
-      const user = await getOneData("/auth/", userGlobal._id);
+
+      const user = await getOneData("/user/", userGlobal._id);
       const disLikeUser = user.commentLikes.filter(
         (item) => item !== comment._id
       );
-      const userStatus = await updateData("/auth/like/", userGlobal._id, {
+      const userJSON = await updateData("/user/", userGlobal._id, {
         commentLikes: disLikeUser,
       });
-      const userJSON = await userStatus.json();
-      if (userStatus.status.toLocaleString().startsWith("4")) {
-        alert("Ha ocurrido un error inesperado, vuelve a intentarlo...");
-        return;
-      }
-      dispatch(setGlobalUser(userJSON));
-      const resData = await getOneData(
+
+      const { comments } = await getOneData(
         "/publication/",
         location.pathname.split("/")[2]
       );
-      setCommentList(resData.comments.reverse());
+
+      dispatch(setGlobalUser(userJSON));
+      setCommentList(comments.reverse());
       setIsLiked(like);
     }
   };
 
   const deleteComment = async () => {
-    const deleteRes = await deleteData("/comment/", comment._id);
-    if (deleteRes.status.toLocaleString().startsWith("4")) {
-      alert("Ha ocurrido un error inesperado, vuelve a intentarlo...");
-      return;
-    }
+    await deleteData("/comment/", comment._id);
+
     const { comments } = await getOneData(
       "/publication/",
       location.pathname.split("/")[2]
@@ -116,32 +97,24 @@ export const Comment = ({ comment, setCommentList }) => {
     const filteredPublication = comments.filter(
       (item) => item._id !== comment._id
     );
-    const publicationRes = await updateData(
+    const data = await updateData(
       "/publication/",
       location.pathname.split("/")[2],
       { comments: filteredPublication }
     );
-    const data = await publicationRes.json();
-    if (publicationRes.status.toLocaleString().startsWith("4")) {
-      alert("Ha ocurrido un error inesperado, vuelve a intentarlo...");
-      return;
-    }
-    const userComments = await getOneData("/auth/", userGlobal._id);
+
+    const userComments = await getOneData("/user/", userGlobal._id);
     const filteredUser = userComments.comments.filter(
       (item) => item._id !== comment._id
     );
     const commentLikes = userComments.commentLikes.filter(
       (item) => item._id !== comment._id
     );
-    const userRes = await updateData("/auth/like/", userGlobal._id, {
+    const userJSON = await updateData("/user/", userGlobal._id, {
       comments: filteredUser,
       commentLikes,
     });
-    const userJSON = await userRes.json();
-    if (userRes.status.toLocaleString().startsWith("4")) {
-      alert("Ha ocurrido un error inesperado, vuelve a intentarlo...");
-      return;
-    }
+
     dispatch(setGlobalUser(userJSON));
     setCommentList(data.comments.reverse());
   };
@@ -170,7 +143,10 @@ export const Comment = ({ comment, setCommentList }) => {
             {comment.date.split("T")[1].split(":")[1]}
           </time>
           {userGlobal && (
-            <MoreVertIcon className="cursor-pointer" onClick={handleClick} />
+            <MoreVertIcon
+              className="cursor-pointer"
+              onClick={(e) => setAnchorEl(e.currentTarget)}
+            />
           )}
           <Menu
             id="basic-menu"
