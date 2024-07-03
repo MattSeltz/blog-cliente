@@ -62,12 +62,13 @@ export const Edit = () => {
         setIsLoading(true);
         setIsMatch(true);
 
-        const data = await updateData("/user/", userGlobal._id, {
+        const data = await updateData("/auth/user/", userGlobal._id, {
           password,
           username,
         });
 
-        sessionStorage.setItem("globalUser", JSON.stringify(data));
+        localStorage.setItem("globalUser", JSON.stringify(data._id));
+        sessionStorage.setItem("globalUser", JSON.stringify(data._id));
         dispatch(setGlobalUser(data));
         navigate("/");
 

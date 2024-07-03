@@ -1,11 +1,9 @@
-import { Avatar, Divider, Menu, MenuItem } from "@mui/material";
-import {
-  FavoriteBorderIcon,
-  FavoriteIcon,
-  MoreVertIcon,
-  EditIcon,
-  DeleteIcon,
-} from "@mui/icons-material";
+import { Avatar, Divider, Menu, MenuItem, Grow } from "@mui/material";
+import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
+import FavoriteIcon from "@mui/icons-material/Favorite";
+import MoreVertIcon from "@mui/icons-material/MoreVert";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
@@ -27,11 +25,15 @@ export const Comment = ({ comment, setCommentList }) => {
   const open = Boolean(anchorEl);
 
   useEffect(() => {
-    const isMatch = comment.likes.filter(
-      (item) => item._id === userGlobal?._id
-    );
+    getOneData("/comment/", comment._id)
+      .then((res) => {
+        const isMatch = res.likes.filter(
+          (item) => item._id === userGlobal?._id
+        );
 
-    isMatch.length > 0 ? setIsLiked(true) : setIsLiked(false);
+        isMatch.length > 0 ? setIsLiked(true) : setIsLiked(false);
+      })
+      .catch((e) => console.error(e));
   }, [userGlobal]);
 
   const sendLike = async (like) => {
@@ -70,7 +72,7 @@ export const Comment = ({ comment, setCommentList }) => {
 
       const user = await getOneData("/user/", userGlobal._id);
       const disLikeUser = user.commentLikes.filter(
-        (item) => item !== comment._id
+        (item) => item._id !== comment._id
       );
       const userJSON = await updateData("/user/", userGlobal._id, {
         commentLikes: disLikeUser,
@@ -120,88 +122,92 @@ export const Comment = ({ comment, setCommentList }) => {
   };
 
   return (
-    <article
-      id={comment._id}
-      className="flex flex-col items-start justify-between shadow-md p-3 rounded-md"
-    >
-      <div className="flex justify-between items-center gap-x-4 text-xs w-full">
-        <div className="flex items-center gap-3">
-          <Avatar
-            alt={comment.author[0].username}
-            src={comment.author[0].icon}
-          />
-          <p className="font-semibold text-gray-900">
-            <Link to={`/user/${comment.author[0]._id}`}>
-              {comment.author[0].username}
-            </Link>
-          </p>
-        </div>
-        <div className="flex items-center">
-          <time dateTime={comment.date} className="text-gray-500">
-            {comment.date.split("T")[0]}{" "}
-            {comment.date.split("T")[1].split(":")[0] - 3}:
-            {comment.date.split("T")[1].split(":")[1]}
-          </time>
-          {userGlobal && (
-            <MoreVertIcon
-              className="cursor-pointer"
-              onClick={(e) => setAnchorEl(e.currentTarget)}
+    <Grow in={comment}>
+      <article
+        id={comment._id}
+        className="flex flex-col items-start justify-between shadow-md p-3 rounded-md"
+      >
+        <div className="flex justify-between items-center gap-x-4 text-xs w-full">
+          <div className="flex items-center gap-3">
+            <Avatar
+              alt={comment.author[0].username}
+              src={comment.author[0].icon}
             />
-          )}
-          <Menu
-            id="basic-menu"
-            anchorEl={anchorEl}
-            open={open}
-            onClose={() => setAnchorEl(null)}
-            MenuListProps={{
-              "aria-labelledby": "basic-button",
-            }}
-          >
-            <MenuItem
-              onClick={() => {
-                setAnchorEl(null);
-                setIsOpen(true);
-              }}
-            >
-              <EditIcon /> Editar
-            </MenuItem>
-            <MenuItem onClick={deleteComment}>
-              <DeleteIcon /> Eliminar
-            </MenuItem>
-          </Menu>
-        </div>
-      </div>
-      <CommentEdit
-        isOpen={isOpen}
-        setIsOpen={setIsOpen}
-        comment={comment}
-        setCommentList={setCommentList}
-      />
-      <div className="group relative w-full">
-        <p className="mt-5 line-clamp-3 text-sm leading-6 text-gray-600">
-          {comment.content}
-        </p>
-        <br />
-        <Divider />
-        <div className="flex justify-between mt-3">
-          <div className="flex gap-1">
-            {isLiked ? (
-              <FavoriteIcon
-                onClick={() => sendLike(false)}
+            <p className="font-semibold text-gray-900">
+              <Link to={`/user/${comment.author[0]._id}`}>
+                {comment.author[0].username}
+              </Link>
+            </p>
+          </div>
+          <div className="flex items-center">
+            <time dateTime={comment.date} className="text-gray-500">
+              {comment.date.split("T")[0]}{" "}
+              {comment.date.split("T")[1].split(":")[0] - 3}:
+              {comment.date.split("T")[1].split(":")[1]}
+            </time>
+            {userGlobal && (
+              <MoreVertIcon
                 className="cursor-pointer"
-              />
-            ) : (
-              <FavoriteBorderIcon
-                onClick={() => sendLike(true)}
-                className="cursor-pointer"
+                onClick={(e) => setAnchorEl(e.currentTarget)}
               />
             )}
-            <span>
-              <b>{comment.likes.length}</b>
-            </span>
+            <Menu
+              id="basic-menu"
+              anchorEl={anchorEl}
+              open={open}
+              onClose={() => setAnchorEl(null)}
+              MenuListProps={{
+                "aria-labelledby": "basic-button",
+              }}
+            >
+              <MenuItem
+                onClick={() => {
+                  setAnchorEl(null);
+                  setIsOpen(true);
+                }}
+              >
+                <EditIcon /> Editar
+              </MenuItem>
+              <MenuItem onClick={deleteComment}>
+                <DeleteIcon /> Eliminar
+              </MenuItem>
+            </Menu>
           </div>
         </div>
-      </div>
-    </article>
+        <CommentEdit
+          isOpen={isOpen}
+          setIsOpen={setIsOpen}
+          comment={comment}
+          setCommentList={setCommentList}
+        />
+        <div className="group relative w-full">
+          <p className="mt-5 line-clamp-3 text-sm leading-6 text-gray-600">
+            {comment.content}
+          </p>
+          <br />
+          <Divider />
+          <div className="flex justify-between mt-3">
+            <div className="flex gap-1">
+              {isLiked ? (
+                <Grow in={isLiked}>
+                  <FavoriteIcon
+                    onClick={() => sendLike(false)}
+                    className="cursor-pointer"
+                  />
+                </Grow>
+              ) : (
+                <FavoriteBorderIcon
+                  onClick={() => sendLike(true)}
+                  className="cursor-pointer"
+                />
+              )}
+              <span>
+                <b>{comment.likes.length}</b>
+              </span>
+            </div>
+          </div>
+        </div>
+      </article>
+    </Grow>
   );
 };

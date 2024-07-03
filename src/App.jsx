@@ -14,7 +14,7 @@ export const App = () => {
 
     if (!user && !sessionUser) return;
 
-    getOneData("/auth/", user?._id ?? sessionUser?._id)
+    getOneData("/user/", user ?? sessionUser)
       .then((res) => dispatch(setGlobalUser(res)))
       .catch((e) => console.error(e));
   }, []);

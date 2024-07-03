@@ -35,9 +35,9 @@ export const Login = () => {
       const data = await postData("/auth/login", { username, password });
 
       if (remember) {
-        localStorage.setItem("globalUser", JSON.stringify(data));
+        localStorage.setItem("globalUser", JSON.stringify(data._id));
       } else {
-        sessionStorage.setItem("globalUser", JSON.stringify(data));
+        sessionStorage.setItem("globalUser", JSON.stringify(data._id));
       }
 
       dispatch(setGlobalUser(data));

@@ -3,15 +3,13 @@ import { useSelector, useDispatch } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 
 import { styled, alpha } from "@mui/material/styles";
-import {
-  SearchIcon,
-  AccountCircle,
-  MoreIcon,
-  HomeIcon,
-  LoginIcon,
-  CreateIcon,
-  LogoutIcon,
-} from "@mui/icons-material";
+import CreateIcon from "@mui/icons-material/Create";
+import SearchIcon from "@mui/icons-material/Search";
+import AccountCircle from "@mui/icons-material/AccountCircle";
+import MoreIcon from "@mui/icons-material/More";
+import HomeIcon from "@mui/icons-material/Home";
+import LoginIcon from "@mui/icons-material/Login";
+import LogoutIcon from "@mui/icons-material/Logout";
 import {
   AppBar,
   Toolbar,
@@ -27,6 +25,7 @@ import {
   ListItemText,
   Divider,
   Avatar,
+  Fade,
   Box,
 } from "@mui/material";
 
@@ -263,7 +262,7 @@ export const NavBar = () => {
               inputProps={{ "aria-label": "search" }}
             />
           </Search>
-          {userList && (
+          <Fade in={userList}>
             <Box
               sx={{
                 width: "100%",
@@ -301,7 +300,7 @@ export const NavBar = () => {
               </nav>
               <Divider />
             </Box>
-          )}
+          </Fade>
           <Box sx={{ flexGrow: 1 }} />
           <Box sx={{ display: { xs: "none", md: "flex" } }}>
             {userGlobal ? (
