@@ -1,35 +1,89 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 import { green } from "@mui/material/colors";
 import { CircularProgress, Box } from "@mui/material";
 
-import { postData } from "../services/services";
+import { getData, postData, updateData } from "../services/services";
 
 export const Recovery = () => {
+  const navigate = useNavigate();
+
   const [email, setEmail] = useState("");
   const [errorMessage, setErrorMessage] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isMatch, setIsMatch] = useState(true);
   const [successMessage, setSuccessMessage] = useState(false);
+  const [code, setCode] = useState("");
+  const [success, setSuccess] = useState(false);
+  const [codeToMatch, setCodeToMatch] = useState(null);
+  const [userID, setUserID] = useState(null);
+  const [password, setPassword] = useState("");
+  const [comparedPassword, setComparedPassword] = useState("");
 
   const send = async (e) => {
     e.preventDefault();
 
-    if (email) {
-      setSuccessMessage(false);
-      setErrorMessage(false);
-      setIsLoading(true);
-      setIsMatch(true);
+    if (userID) {
+      if (password && comparedPassword) {
+        setErrorMessage(false);
+        if (password === comparedPassword) {
+          setIsLoading(true);
+          setIsMatch(true);
 
-      await postData("/email/recovery", { email });
+          await updateData("/auth/recovery/", userID, {
+            password,
+          });
 
-      setSuccessMessage(true);
+          navigate("/login");
 
-      setEmail("");
-      setIsLoading(false);
+          setIsLoading(false);
+        } else {
+          setIsMatch(false);
+        }
+
+        setPassword("");
+        setComparedPassword("");
+      } else {
+        setErrorMessage(true);
+      }
     } else {
-      setErrorMessage(true);
+      if (success) {
+        setSuccessMessage(false);
+        if (code === codeToMatch) {
+          setErrorMessage(false);
+
+          const res = await getData("/user");
+
+          const user = res.filter((item) => item.email === email);
+
+          setUserID(user[0]._id);
+        } else {
+          setErrorMessage(true);
+        }
+      } else {
+        if (email) {
+          const rand = crypto.randomUUID().split("-")[0];
+          setCodeToMatch(rand);
+          setSuccessMessage(false);
+          setSuccess(false);
+          setErrorMessage(false);
+          setIsLoading(true);
+          setIsMatch(true);
+
+          await postData("/email/recovery", {
+            email,
+            code: rand,
+          });
+
+          setSuccessMessage(true);
+          setSuccess(true);
+
+          setIsLoading(false);
+        } else {
+          setErrorMessage(true);
+        }
+      }
     }
   };
 
@@ -48,13 +102,13 @@ export const Recovery = () => {
 
       {errorMessage && (
         <p className="mt-3 text-center text-xl text-red-500">
-          Falta completar datos
+          {success ? "Código incorrecto" : "Falta completar datos"}
         </p>
       )}
 
       {!isMatch && (
         <p className="mt-3 text-center text-xl text-red-500">
-          Email incorrecto
+          {userID ? "No coinciden las contraseñas" : "Email incorrecto"}
         </p>
       )}
 
@@ -66,25 +120,89 @@ export const Recovery = () => {
 
       <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
         <form className="space-y-6" autoComplete="off" onSubmit={send}>
-          <div>
-            <label
-              htmlFor="email"
-              className="block text-sm font-medium leading-6 text-gray-900"
-            >
-              Email
-            </label>
-            <div className="mt-2">
-              <input
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                id="email"
-                name="email"
-                type="email"
-                required
-                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-              />
+          {userID ? (
+            <>
+              <div>
+                <label
+                  htmlFor="password"
+                  className="block text-sm font-medium leading-6 text-gray-900"
+                >
+                  Nueva contraseña
+                </label>
+                <div className="mt-2">
+                  <input
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    id="password"
+                    name="password"
+                    type="password"
+                    required
+                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label
+                  htmlFor="comparedPassword"
+                  className="block text-sm font-medium leading-6 text-gray-900"
+                >
+                  Repita la contraseña
+                </label>
+                <div className="mt-2">
+                  <input
+                    value={comparedPassword}
+                    onChange={(e) => setComparedPassword(e.target.value)}
+                    id="comparedPassword"
+                    name="comparedPassword"
+                    type="password"
+                    required
+                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                  />
+                </div>
+              </div>
+            </>
+          ) : success ? (
+            <div>
+              <label
+                htmlFor="code"
+                className="block text-sm font-medium leading-6 text-gray-900"
+              >
+                Código
+              </label>
+              <div className="mt-2">
+                <input
+                  value={code}
+                  onChange={(e) => setCode(e.target.value)}
+                  id="code"
+                  name="code"
+                  type="text"
+                  required
+                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                />
+              </div>
             </div>
-          </div>
+          ) : (
+            <div>
+              <label
+                htmlFor="email"
+                className="block text-sm font-medium leading-6 text-gray-900"
+              >
+                Email
+              </label>
+              <div className="mt-2">
+                <input
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  id="email"
+                  name="email"
+                  type="email"
+                  required
+                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                />
+              </div>
+            </div>
+          )}
 
           <Box
             sx={{
