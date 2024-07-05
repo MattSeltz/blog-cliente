@@ -12,7 +12,8 @@ export const getData = async uri => {
     if(res.ok) {
       return data
     }else{
-      return false
+      alert("Ha ocurrido un error inesperado, por favor vuelve a intentarlo...")
+      location.reload()
     }
   } catch (error) {
     console.error(error)
@@ -31,7 +32,8 @@ export const getOneData = async (uri,id) => {
     if(res.ok) {
       return data
     }else{
-      return false
+      alert("Ha ocurrido un error inesperado, por favor vuelve a intentarlo...")
+      location.reload()
     }
   } catch (error) {
     console.error(error)
@@ -54,7 +56,8 @@ export const postData = async (uri,body) => {
     if(res.ok) {
       return data
     }else{
-      return false
+      alert("Ha ocurrido un error inesperado, por favor vuelve a intentarlo...")
+      location.reload()
     }
   } catch (error) {
     console.error(error)
@@ -77,7 +80,8 @@ export const updateData = async (uri,id,body) => {
     if(res.ok) {
       return data
     }else{
-      return false
+      alert("Ha ocurrido un error inesperado, por favor vuelve a intentarlo...")
+      location.reload()
     }
   } catch (error) {
     console.error(error)
@@ -96,7 +100,8 @@ export const deleteData = async (uri,id) => {
     if(res.ok) {
       return data
     }else{
-      return false
+      alert("Ha ocurrido un error inesperado, por favor vuelve a intentarlo...")
+      location.reload()
     }
   } catch (error) {
     console.error(error)
