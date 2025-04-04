@@ -136,7 +136,7 @@ export const Comment = ({ comment, setCommentList }) => {
 						<p className="font-semibold text-gray-900">
 							<Link
 								to={
-									userGlobal._id === comment.author[0]._id
+									userGlobal?._id === comment.author[0]._id
 										? "/profile"
 										: `/user/${comment.author[0]._id}`
 								}
@@ -151,7 +151,7 @@ export const Comment = ({ comment, setCommentList }) => {
 							{comment.date.split("T")[1].split(":")[0] - 3}:
 							{comment.date.split("T")[1].split(":")[1]}
 						</time>
-						{userGlobal._id === comment.author[0]._id && (
+						{userGlobal?._id === comment.author[0]._id && (
 							<MoreVertIcon
 								className="cursor-pointer"
 								onClick={(e) => setAnchorEl(e.currentTarget)}

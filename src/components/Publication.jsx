@@ -136,7 +136,7 @@ export const Publication = ({ publication, setPublicationList }) => {
 						<p className="font-semibold text-gray-900">
 							<Link
 								to={
-									userGlobal._id === publication.author[0]._id
+									userGlobal?._id === publication.author[0]._id
 										? "/profile"
 										: `/user/${publication.author[0]._id}`
 								}
@@ -151,7 +151,7 @@ export const Publication = ({ publication, setPublicationList }) => {
 							{publication.date.split("T")[1].split(":")[0] - 3}:
 							{publication.date.split("T")[1].split(":")[1]}
 						</time>
-						{userGlobal._id === publication.author[0]._id && (
+						{userGlobal?._id === publication.author[0]._id && (
 							<MoreVertIcon
 								className="cursor-pointer"
 								onClick={(e) => setAnchorEl(e.currentTarget)}

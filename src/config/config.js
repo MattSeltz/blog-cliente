@@ -1,1 +1,1 @@
-export const ENVIRONMENT = process.env.REACT_APP_ENVIRONMENT ?? "http://localhost:3000"
+export const ENVIRONMENT = import.meta.env.VITE_ENVIRONMENT;
