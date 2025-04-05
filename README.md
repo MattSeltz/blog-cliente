@@ -21,6 +21,6 @@ Está desarrollada en **React** y enfocada en ofrecer una experiencia moderna, r
 
 - **React**
 - **React Router**
-- **Context API / Hooks**
+- **Context API**
 - **Tailwind CSS**
 
